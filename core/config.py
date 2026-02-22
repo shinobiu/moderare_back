@@ -5,7 +5,7 @@ class Settings:
     def __init__(self):
         load_dotenv()
 
-        self.APP_NAME = os.getenv("APP_NAME", "Vicio API")
+        self.APP_NAME = os.getenv("APP_NAME", "Moderare API")
         self.ENV = os.getenv("ENV", "development")
         
         self.APP_URL = os.getenv("APP_URL")
