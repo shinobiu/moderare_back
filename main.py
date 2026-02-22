@@ -8,7 +8,7 @@ from api.Pessoa import router as pessoa_router
 LoggingConfig.setup()
 
 
-app = FastAPI(title="Vicio API")
+app = FastAPI(title="Moderare API")
 app.middleware("http")(RequestLoggingMiddleware())
 
 CORSConfig.setup(app)
