@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from core.cors import CORSConfig
 from api.Auth import router as auth_router
@@ -7,8 +9,15 @@ from api.Pessoa import router as pessoa_router
 
 LoggingConfig.setup()
 
+ENV = os.getenv("ENVIRONMENT", "dev")
 
-app = FastAPI(title="Moderare API")
+app = FastAPI(
+    title="Moderare API", 
+    docs_url=None if ENV == "prod" else "/docs",
+    redoc_url=None if ENV == "prod" else "/redoc",
+    openapi_url=None if ENV == "prod" else "/openapi.json",
+    )
+
 app.middleware("http")(RequestLoggingMiddleware())
 
 CORSConfig.setup(app)

@@ -7,6 +7,7 @@ from database.session import get_db
 from services.PessoaService import PessoaService
 from schemas.Auth import CadastroRequest, LoginRequest, TokenResponse
 from core.auth_dependency import get_current_user_id
+from core.auth_dependency import JWTService
 
 router = APIRouter(
     prefix="/auth",
@@ -16,10 +17,13 @@ router = APIRouter(
 @router.post("/register")
 def register(
     payload: CadastroRequest,
+    response: Response,
     db: Session = Depends(get_db)
 ):
+    
     try:
-        PessoaService(db).cadastrar(
+    
+        user = PessoaService(db).cadastrar(
             email=payload.email,
             senha=payload.senha,
             nome=payload.nome,
@@ -31,8 +35,7 @@ def register(
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
+    
 @router.post("/login")
 def login(
     payload: LoginRequest,
@@ -49,7 +52,7 @@ def login(
             key="access_token",
             value=token,
             httponly=True,
-            secure=False,        # True em produção (HTTPS)
+            secure=True,        # True em produção (HTTPS)
             samesite="lax",     # se front e back estiverem no mesmo domínio
             max_age=60 * 60 * 24
         )
@@ -77,7 +80,7 @@ def logout(response: Response):
         max_age=0,
         expires=0,
         httponly=True,
-        secure=False,
+        secure=True,
         samesite="lax"
     )
 

@@ -18,7 +18,9 @@ class PasswordService:
 
 
 class JWTService:
+
     def create(self, subject: str) -> str:
+
         expire = datetime.utcnow() + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
@@ -34,12 +36,22 @@ class JWTService:
             algorithm=settings.ALGORITHM
         )
 
-    def decode(self, token: str) -> dict:
+
+    def verify(self, token: str) -> str:
+
         try:
-            return jwt.decode(
+            payload = jwt.decode(
                 token,
                 settings.SECRET_KEY,
                 algorithms=[settings.ALGORITHM]
             )
+
+            subject = payload.get("sub")
+
+            if subject is None:
+                raise JWTError("Token sem subject")
+
+            return subject
+
         except JWTError:
-            raise ValueError("Token inválido")
+            raise JWTError("Token inválido ou expirado")

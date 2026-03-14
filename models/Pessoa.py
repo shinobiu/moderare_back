@@ -15,7 +15,7 @@ from core.database import Base
 
 
 class Pessoa(Base):
-    __tablename__ = "usuarios"
+    __tablename__ = "pessoa"
     __table_args__ = {"schema": "public"}
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -39,12 +39,6 @@ class Pessoa(Base):
     nome: Mapped[str] = mapped_column(
         String(150),
         nullable=False
-    )
-
-    cpf: Mapped[str | None] = mapped_column(
-        CHAR(11),
-        nullable=True,
-        unique=True
     )
 
     ativo: Mapped[bool] = mapped_column(

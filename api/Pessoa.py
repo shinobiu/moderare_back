@@ -16,7 +16,7 @@ router = APIRouter(
 @router.patch("/me")
 def atualizar_meus_dados(
     payload: PessoaUpdateRequest,
-    pessoa_id: str = Depends(get_current_user_id),
+    pessoa_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
     try:
@@ -26,7 +26,7 @@ def atualizar_meus_dados(
         )
         return {"msg": "Dados atualizados com sucesso"}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Erro ao atualizar os dados")
 
 @router.get("/me", response_model=PessoaResponse)
 def read_me(
@@ -37,4 +37,4 @@ def read_me(
         pessoa = PessoaService(db).obter_por_id(pessoa_id)
         return pessoa
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
