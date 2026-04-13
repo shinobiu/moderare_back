@@ -20,6 +20,8 @@ class Settings:
         self.SMTP_USER= os.getenv("SMTP_USER")
         self.SMTP_PASSWORD= os.getenv("SMTP_PASSWORD")
         self.SMTP_FROM = os.getenv("SMTP_FROM")
+        self.FRONT_URL = os.getenv("FRONT_URL")
+        self.SITE_SECRET = os.getenv("SITE_SECRET")
 
         if not all([
             self.DB_HOST,

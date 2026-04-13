@@ -6,6 +6,9 @@ from api.Auth import router as auth_router
 from core.logging import LoggingConfig
 from middlewares.logging import RequestLoggingMiddleware
 from api.Pessoa import router as pessoa_router
+from api.Streak import router as streak_router
+from api.MetaStreak import router as meta_router
+
 
 LoggingConfig.setup()
 
@@ -24,3 +27,5 @@ CORSConfig.setup(app)
 
 app.include_router(auth_router)
 app.include_router(pessoa_router)
+app.include_router(streak_router)
+app.include_router(meta_router)

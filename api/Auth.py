@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
+from core.captcha import verify_captcha
 from models.Pessoa import Pessoa
 from services.email_confirm_service import EmailConfirmService
 from services.email_service import EmailService
@@ -7,7 +8,6 @@ from database.session import get_db
 from services.PessoaService import PessoaService
 from schemas.Auth import CadastroRequest, LoginRequest, TokenResponse
 from core.auth_dependency import get_current_user_id
-from core.auth_dependency import JWTService
 
 router = APIRouter(
     prefix="/auth",
@@ -15,13 +15,14 @@ router = APIRouter(
 )
 
 @router.post("/register")
-def register(
+async def register(
     payload: CadastroRequest,
     response: Response,
     db: Session = Depends(get_db)
 ):
     
     try:
+        await verify_captcha(payload.captcha)
     
         user = PessoaService(db).cadastrar(
             email=payload.email,
@@ -37,7 +38,7 @@ def register(
         raise HTTPException(status_code=400, detail=str(e))
     
 @router.post("/login")
-def login(
+async def login(
     payload: LoginRequest,
     response: Response,
     db: Session = Depends(get_db)
@@ -47,13 +48,15 @@ def login(
             payload.email,
             payload.senha
         )
+        
+        await verify_captcha(payload.captcha)
 
         response.set_cookie(
             key="access_token",
             value=token,
             httponly=True,
             secure=True,        # True em produção (HTTPS)
-            samesite="lax",     # se front e back estiverem no mesmo domínio
+            samesite="none",     # se front e back estiverem no mesmo domínio
             max_age=60 * 60 * 24
         )
 
@@ -74,14 +77,14 @@ def confirm_email(token: str, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie(
+    response.set_cookie(
         key="access_token",
         value="",
         max_age=0,
         expires=0,
-        httponly=True,
+        path="/",
         secure=True,
-        samesite="lax"
+        samesite="none"
     )
 
     return {"message": "Logout realizado com sucesso"}

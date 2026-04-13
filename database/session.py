@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from core.config import settings
 
 
 class DatabaseSession:
+    Base = declarative_base()
     def __init__(self):
         self.engine = create_engine(
             settings.DATABASE_URL,

@@ -31,7 +31,7 @@ class EmailService:
 
 
     def enviar_confirmacao(self, destino: str, token: str):
-        link = f"{settings.APP_URL}/auth/confirmar-email?token={token}"
+        link = f"{settings.FRONT_URL}/dashboard/confirma-email?token={token}"
 
         assunto = "Confirme seu e-mail"
         corpo_texto = f"""
