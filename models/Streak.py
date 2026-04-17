@@ -52,3 +52,15 @@ class Streak(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+    
+    recorde: Mapped[int] = mapped_column(
+        Integer,
+        nullable=True,
+        default=0
+    )
+
+    total_falhas: Mapped[int] = mapped_column(
+        Integer,
+        nullable=True,
+        default=0
+    )

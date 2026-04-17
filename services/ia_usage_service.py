@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from uuid import UUID
@@ -25,7 +26,13 @@ class IAUsageService:
         if not uso:
             return True
 
-        return uso.ultimo_uso.date() < hoje
+        if hoje > uso.ultimo_uso.date():
+            return True
+              
+        raise HTTPException(
+                status_code=400,
+                detail="Limite máximo de uso da IA"
+            )
 
     # =========================
     # REGISTRAR USO
@@ -42,7 +49,7 @@ class IAUsageService:
                 tipo=tipo.value
             )
 
-        uso.ultimo_uso = datetime.utcnow()
+        uso.ultimo_uso = datetime.now(timezone.utc).date()
 
         self.db.add(uso)
         self.db.commit()

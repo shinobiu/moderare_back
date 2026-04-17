@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from api.MetaStreak import cancela
 
 from models.Streak import Streak
-from schemas.Streak import StreakResponse
+from schemas.Streak import StreakResponse, CheckinRequest
 from models.MetaStreak import MetaStreak
+from services.mensagem_service import MensagemService
 
 
 class StreakService:
@@ -48,13 +49,12 @@ class StreakService:
             self.db.commit()
             self.db.refresh(streak)
 
-
         return streak
 
     # =========================
     # CHECKIN
     # =========================
-    def checkin(self, pessoa_id: UUID):
+    def checkin(self, pessoa_id: UUID, humor):
 
         hoje = datetime.utcnow().date()
 
@@ -62,40 +62,86 @@ class StreakService:
 
         if streak.ultimo_checkin == hoje:
             raise HTTPException(
-        status_code=400,
-        detail="Check-in já realizado hoje"
-    )
-
+                status_code=400,
+                detail="Check-in já realizado hoje"
+            )
+            
+        perdeu = False
+            
         if streak.ultimo_checkin is None:
             streak.dias = 1
             streak.data_inicio = hoje
 
         elif streak.ultimo_checkin == hoje - timedelta(days=1):
             streak.dias += 1
+            if streak.recorde <= streak.dias:
+                streak.recorde = streak.dias
+
         else:
             streak.dias = 1
             streak.data_inicio = hoje
+            perdeu = True
 
         streak.ultimo_checkin = hoje
+
+        mensagem = MensagemService(self.db).get_mensagem_checkin(
+            pessoa_id=pessoa_id,
+            dias=streak.dias,
+            perdeu=perdeu,
+            humor=humor
+            )
 
         self.db.commit()
         self.db.refresh(streak)
 
-        return StreakResponse.model_validate(streak)
-    # =========================
-    # STATUS
-    # =========================
-    def obter_status(self, pessoa_id: UUID) -> Streak:
-        return self.get_or_create(pessoa_id)
+        return {
+            "dias_streak": streak.dias,
+            "mensagem": mensagem,
+            "perdeu_streak": perdeu
+        }
     
-    def reset(self, pessoa_id: UUID):
+
+    def obter_status(self, pessoa_id: UUID):
+        
+        streak = self.get_or_create(pessoa_id)
+        hoje = datetime.utcnow().date()
+        ontem = hoje - timedelta(days=1)
+        perdeu_streak = ( streak.dias == 0 and streak.ultimo_checkin == hoje)
+
+        if perdeu_streak:
+            mensagem = MensagemService(self.db).get_mensagem_usuario(
+            pessoa_id, 'ALERTA'
+        )
+        else:
+            mensagem = MensagemService(self.db).get_mensagem_usuario(
+            pessoa_id, 'CHECKIN'
+        )
+
+        return {
+            "mensagem": mensagem.conteudo if mensagem else None,
+            "dias": streak.dias,
+            "id": streak.id,
+            "data_inicio": streak.data_inicio,
+            "ultimo_checkin": streak.ultimo_checkin,
+            "recorde": streak.recorde
+            }
+    
+    def reset(self, pessoa_id: UUID, humor):
         streak = self.get_or_create(pessoa_id)
 
         hoje = datetime.utcnow().date()
 
+        mensagem = MensagemService(self.db).get_mensagem_relapse(
+            pessoa_id=pessoa_id,
+            dias=streak.dias,
+            perdeu=True,
+            humor=humor
+            )
+
         streak.dias = 0
         streak.data_inicio = hoje
-        streak.ultimo_checkin = None
+        streak.ultimo_checkin = hoje
+        streak.total_falhas = streak.total_falhas + 1
 
         self.db.commit()
         self.db.refresh(streak)
@@ -111,9 +157,6 @@ class StreakService:
             self.db.commit()
             self.db.refresh(meta)
         
-                
-        
-        
         streak = self.db.query(Streak).filter(
             Streak.pessoa_id == pessoa_id
         ).first()
@@ -121,6 +164,8 @@ class StreakService:
         if not streak:
             raise ValueError("Streak não encontrado")
         
-
-
-        return StreakResponse.model_validate(streak)
+        return {
+            "dias_streak": streak.dias,
+            "mensagem": mensagem,
+            "perdeu_streak": True
+        }

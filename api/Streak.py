@@ -7,7 +7,7 @@ from core.auth_dependency import get_current_user_id
 
 from schemas.Resaponse import ApiResponse
 from services.StreakService import StreakService
-from schemas.Streak import StreakResponse
+from schemas.Streak import CheckinRequest
 
 
 router = APIRouter(
@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.get("/me", response_model=ApiResponse[StreakResponse])
+@router.get("/me")
 def obter_meu_streak(
     pessoa_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -25,28 +25,31 @@ def obter_meu_streak(
 
     return {
         "success": True,
-        "data": StreakResponse.model_validate(result)
+        "data": result
     }
 
 
-@router.post("/checkin", response_model=ApiResponse[StreakResponse])
+@router.post("/checkin")
 def checkin(
+    payload: CheckinRequest,
     pessoa_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
-    result = StreakService(db).checkin(pessoa_id)
+    result = StreakService(db).checkin(pessoa_id, payload.humor)
 
     return {
         "success": True,
-        "data": StreakResponse.model_validate(result)
+        "data": result
     }
     
-@router.post("/reset", response_model=ApiResponse[StreakResponse])
-def resetar_streak(pessoa_id: UUID = Depends(get_current_user_id),
+@router.post("/reset")
+def resetar_streak(
+    payload: CheckinRequest,
+    pessoa_id: UUID = Depends(get_current_user_id),
     db: Session = Depends(get_db)):
     service = StreakService(db)
-    result = service.reset(pessoa_id)
+    result = service.reset(pessoa_id, payload.humor)
     return {
         "success": True,
-        "data": StreakResponse.model_validate(result)
+        "data": result
     }

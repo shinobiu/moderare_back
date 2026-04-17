@@ -10,7 +10,7 @@ class IAUsage(Base):
 
     pessoa_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey("pessoa.id"),
+        ForeignKey("public.pessoa.id"),
         primary_key=True,
         nullable=False
     )

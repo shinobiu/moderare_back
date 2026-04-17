@@ -22,6 +22,7 @@ class Settings:
         self.SMTP_FROM = os.getenv("SMTP_FROM")
         self.FRONT_URL = os.getenv("FRONT_URL")
         self.SITE_SECRET = os.getenv("SITE_SECRET")
+        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
         if not all([
             self.DB_HOST,
