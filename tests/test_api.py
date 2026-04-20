@@ -12,3 +12,12 @@ def test_health():
     res = client.get("/health")
     assert res.status_code == 200
     assert res.json()["status"] == "ok"
+
+def test_unauthorized_access():
+    response = client.get("/pessoa/me")
+    assert response.status_code == 401
+
+def test_not_found():
+    res = client.get("/rota-invalida")
+    assert res.status_code == 404
+
