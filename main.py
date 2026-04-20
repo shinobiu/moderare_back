@@ -21,6 +21,10 @@ app = FastAPI(
     openapi_url=None if ENV == "prod" else "/openapi.json",
     )
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 app.middleware("http")(RequestLoggingMiddleware())
 
 CORSConfig.setup(app)
