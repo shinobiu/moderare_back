@@ -10,3 +10,4 @@ email-validator
 slowapi
 httpx
 openai
+pytest
