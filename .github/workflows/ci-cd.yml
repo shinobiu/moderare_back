@@ -12,6 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set env vars
+        run: |
+          export DB_HOST=localhost
+          export DB_USER=test
+          export DB_PASSWORD=test
+          export DB_NAME=test
+          PYTHONPATH=. pytest
       - name: Build
         uses: actions/checkout@v4
 
