@@ -21,3 +21,6 @@ def test_not_found():
     res = client.get("/rota-invalida")
     assert res.status_code == 404
 
+def test_auth_login_validation():
+    res = client.post("/auth/login", json={})
+    assert res.status_code in [400, 422]
