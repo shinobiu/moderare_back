@@ -31,8 +31,7 @@ jobs:
           export DB_PASSWORD=test
           export DB_NAME=test
           export SECRET_KEY=test
-      - name: Run tests
-        run: PYTHONPATH=. pytest
+          PYTHONPATH=. pytest
 
   deploy:
     runs-on: ubuntu-latest
