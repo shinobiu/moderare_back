@@ -12,13 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set env vars
-        run: |
-          export DB_HOST=localhost
-          export DB_USER=test
-          export DB_PASSWORD=test
-          export DB_NAME=test
-          PYTHONPATH=. pytest
       - name: Build
         uses: actions/checkout@v4
 
@@ -31,7 +24,12 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install pytest
-
+      - name: Set env vars
+        run: |
+          export DB_HOST=localhost
+          export DB_USER=test
+          export DB_PASSWORD=test
+          export DB_NAME=test
       - name: Run tests
         run: PYTHONPATH=. pytest
 
