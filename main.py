@@ -3,8 +3,8 @@ import os
 from fastapi import FastAPI
 from core.cors import CORSConfig
 from api.Auth import router as auth_router
-from core.logging import LoggingConfig
-from middlewares.logging import RequestLoggingMiddleware
+from core.log_config import LoggingConfig
+from middlewares.log_middleware import RequestLoggingMiddleware
 from api.Pessoa import router as pessoa_router
 from api.Streak import router as streak_router
 from api.MetaStreak import router as meta_router
