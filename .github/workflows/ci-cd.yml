@@ -31,6 +31,7 @@ jobs:
           export DB_PASSWORD=test
           export DB_NAME=test
           export SECRET_KEY=test
+          export OPENAI_API_KEY=fake-key
           PYTHONPATH=. pytest
 
   deploy:
