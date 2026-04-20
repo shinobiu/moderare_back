@@ -24,3 +24,7 @@ def test_not_found():
 def test_auth_login_validation():
     res = client.post("/auth/login", json={})
     assert res.status_code in [400, 422]
+
+def test_auth_register_validation():
+    res = client.post("/auth/register", json={})
+    assert res.status_code in [400, 422]
