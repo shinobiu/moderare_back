@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: PYTHONPATH=. pytest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build   # 🔥 só roda se build passar
+
+    if: github.ref == 'refs/heads/main'  # só no main
+
+    steps:
+      - name: Deploy
+        run: |
+          echo "Iniciando deploy..."
+          echo "Build aprovado com sucesso!"
+          echo "Aplicação pronta para produção 🚀"
