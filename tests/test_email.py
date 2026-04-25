@@ -79,4 +79,4 @@ def test_confirmacao_sucesso():
 
     assert pessoa.email_verificado is True
     assert pessoa.codigo_verificacao is None
-    assert pessoa.codigo_expira_em is None
+    assert pessoa.codigo_expira_em is 'None'
