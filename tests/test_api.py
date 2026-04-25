@@ -28,3 +28,7 @@ def test_auth_login_validation():
 def test_auth_register_validation():
     res = client.post("/auth/register", json={})
     assert res.status_code in [400, 422]
+
+
+
+
