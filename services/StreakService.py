@@ -29,9 +29,8 @@ class StreakService:
 
         hoje = datetime.utcnow().date()
         ontem = hoje - timedelta(days=1)
-        
-        perdeu_streak = ( streak.ultimo_checkin is not None and streak.ultimo_checkin < ontem)
-        
+
+
         if not streak:
             streak = Streak(
                 pessoa_id=pessoa_id,
@@ -41,7 +40,10 @@ class StreakService:
             self.db.add(streak)
             self.db.commit()
             self.db.refresh(streak)
-        elif perdeu_streak:
+
+        perdeu_streak = ( streak.ultimo_checkin is not None and streak.ultimo_checkin < ontem)
+
+        if perdeu_streak:
             streak.dias = 0
             streak.data_inicio = hoje
             streak.ultimo_checkin = None
@@ -65,9 +67,9 @@ class StreakService:
                 status_code=400,
                 detail="Check-in já realizado hoje"
             )
-            
+
         perdeu = False
-            
+
         if streak.ultimo_checkin is None:
             streak.dias = 1
             streak.data_inicio = hoje
@@ -99,10 +101,10 @@ class StreakService:
             "mensagem": mensagem,
             "perdeu_streak": perdeu
         }
-    
+
 
     def obter_status(self, pessoa_id: UUID):
-        
+
         streak = self.get_or_create(pessoa_id)
         hoje = datetime.utcnow().date()
         ontem = hoje - timedelta(days=1)
@@ -125,7 +127,7 @@ class StreakService:
             "ultimo_checkin": streak.ultimo_checkin,
             "recorde": streak.recorde
             }
-    
+
     def reset(self, pessoa_id: UUID, humor):
         streak = self.get_or_create(pessoa_id)
 
@@ -145,7 +147,7 @@ class StreakService:
 
         self.db.commit()
         self.db.refresh(streak)
-        
+
         meta = self.db.query(MetaStreak).filter(
             MetaStreak.pessoa_id == pessoa_id,
             MetaStreak.ativo == True
@@ -156,14 +158,14 @@ class StreakService:
             meta.streak_inicial = 0
             self.db.commit()
             self.db.refresh(meta)
-        
+
         streak = self.db.query(Streak).filter(
             Streak.pessoa_id == pessoa_id
         ).first()
 
         if not streak:
             raise ValueError("Streak não encontrado")
-        
+
         return {
             "dias_streak": streak.dias,
             "mensagem": mensagem,
